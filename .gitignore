@@ -1,3 +1,12 @@
+# own ignores
+
+slurm-*
+desktop.ini
+batch.sh
+
+results
+data/model_data
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
