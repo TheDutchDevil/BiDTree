@@ -1,6 +1,7 @@
 import numpy as np
 import cPickle as pickle
 import math
+import json
 
 UNK = "$UNK$"
 NUM = "$NUM$"
@@ -89,11 +90,27 @@ class DepsDataset(object):
     def __iter__(self):
         niter = 0
         with open(self.filename) as f:
-            btup_idx_list, btup_words_list, btup_depwords_list, \
-            btup_deprels_list, btup_depwords_length_list, \
-            upbt_idx_list, upbt_words_list, upbt_depwords_list, \
-            upbt_deprels_list, upbt_depwords_length_list, \
-            btup_formidx_list, upbt_formidx_list= pickle.load(f)
+            if self.filename.endswith(".deps"):
+                btup_idx_list, btup_words_list, btup_depwords_list, \
+                btup_deprels_list, btup_depwords_length_list, \
+                upbt_idx_list, upbt_words_list, upbt_depwords_list, \
+                upbt_deprels_list, upbt_depwords_length_list, \
+                btup_formidx_list, upbt_formidx_list= pickle.load(f)
+            elif self.filename.endswith(".json"):
+                raw_data = json.load(f)
+
+                btup_idx_list = raw_data["btup_idx_list"]
+                btup_words_list = raw_data["btup_words_list"]
+                btup_depwords_list = raw_data["btup_depwords_list"]
+                btup_deprels_list = raw_data["btup_deprels_list"]
+                btup_depwords_length_list = raw_data["btup_depwords_length_list"]
+                upbt_idx_list = raw_data["upbt_idx_list"]
+                upbt_words_list = raw_data["upbt_words_list"]
+                upbt_depwords_list = raw_data["upbt_depwords_list"]
+                upbt_deprels_list = raw_data["upbt_deprels_list"]
+                upbt_depwords_length_list = raw_data["upbt_depwords_length_list"]
+                btup_formidx_list = raw_data["btup_formidx_list"]
+                upbt_formidx_list = raw_data["upbt_formidx_list"]
 
             for btup_idx, btup_words, btup_depwords, btup_deprels, btup_depwords_length, \
                 upbt_idx, upbt_words, upbt_depwords, upbt_deprels, upbt_depwords_length, \

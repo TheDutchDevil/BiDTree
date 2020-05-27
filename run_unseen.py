@@ -19,7 +19,7 @@ and then it reads in the unseen data.
 
 def parse_parameters():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, help="path to the data on which predictions should be given. If files are under a/data.deps and a/data.txt the value should be a/data")
+    parser.add_argument('--data', type=str, help="path to the data on which predictions should be given. If files are under a/data.json and a/data.txt the value should be a/data")
     parser.add_argument('--trained_on', type=str, default="laptops_2014", help="dataset on which the model has been trained.")
 
     args, _ = parser.parse_known_args()
@@ -29,7 +29,7 @@ def config_from_args(args):
     args.data_sets = args.trained_on
 
     args.txt_file = "{}.txt".format(args.data)
-    args.deps_file = "{}.deps".format(args.data)
+    args.deps_file = "{}.json".format(args.data)
     
     config = Config()
     for key, value in vars(args).items():
@@ -67,6 +67,9 @@ if __name__ == "__main__":
 
     data = [dev, test, train]
 
+    for row in data_in_CoNLL:
+        pass
+
     _ = map(len, chain.from_iterable(w for w in (s for s in data)))
     max_sentence_size = max(train.max_words_len, dev.max_words_len, test.max_words_len)
     max_word_size = max(train.max_chars_len, test.max_chars_len, dev.max_chars_len)
@@ -95,4 +98,6 @@ if __name__ == "__main__":
     model = DepsModel(config, embeddings, logger=logger)
     model.build()
 
-    #model.predict(data_in_CoNLL, deps_data, vocab_words, vocab_tags)
+    logger.info("Max sentence length of train data is {}, current max sent length is {}".format(max_sentence_size, data_in_CoNLL.max_words_len))
+
+    model.predict(data_in_CoNLL, deps_data, vocab_words, vocab_tags)

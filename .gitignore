@@ -2,7 +2,8 @@
 
 slurm-*
 desktop.ini
-batch.sh
+
+unseen
 
 results
 data/model_data

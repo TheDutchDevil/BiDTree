@@ -609,6 +609,30 @@ class DepsModel(object):
         test_acc = np.mean(test_accs)
         return p, r, f1, test_acc
 
+    def run_predict(self, sess, test, test_deps, vocab_words, vocab_tags, print_test_results=False):
+        """
+        Evaluates performance on test set
+        """
+        idx_to_words = {}
+        if print_test_results:
+            idx_to_words = {idx: word for word, idx in vocab_words.iteritems()}
+
+        test_accs = []
+        self.config.istrain = False  # set to test first, #batch normalization#
+        for words, poss, chunks, labels, \
+            btup_idx_list, btup_words_list, btup_depwords_list, btup_deprels_list, btup_depwords_length_list, \
+            upbt_idx_list, upbt_words_list, upbt_depwords_list, upbt_deprels_list, upbt_depwords_length_list, \
+            btup_formidx_list, upbt_formidx_list in minibatches(test, test_deps, self.config.batch_size):
+
+            labels_pred, sequence_lengths = self.predict_batch(sess, words, poss, chunks,
+                                                               btup_idx_list, btup_words_list, btup_depwords_list,
+                                                               btup_deprels_list, btup_depwords_length_list,
+                                                               upbt_idx_list, upbt_words_list, upbt_depwords_list,
+                                                               upbt_deprels_list, upbt_depwords_length_list,
+                                                               btup_formidx_list, upbt_formidx_list)
+
+        return labels_pred, sequence_lengths
+
     def evaluate(self, test, test_deps, vocab_words, vocab_tags):
         saver = tf.train.Saver()
 
@@ -621,3 +645,33 @@ class DepsModel(object):
                                                    print_test_results=self.config.show_test_results)
             self.logger.info(
                 "- test acc {:04.2f} - test recall {:04.2f} - f1 {:04.2f}".format(100 * acc, 100 * recall, 100 * f1))
+
+    def predict(self, data, data_deps, vocab_words, vocab_tags):
+        saver = tf.train.Saver()
+
+        gpuConfig = tf.ConfigProto()
+        gpuConfig.gpu_options.allow_growth = True
+        with tf.Session(config=gpuConfig) as sess:
+            self.logger.info("Running predictions on unseen data")
+            saver.restore(sess, self.config.model_output)
+            labels_pred, seq_lengths = self.run_predict(sess, data, data_deps, vocab_words, vocab_tags,
+                                                   print_test_results=self.config.show_test_results)
+
+            i = 0
+            for item in data:
+                words = item[0]
+                pred = labels_pred[i]
+
+                word_ids = [word[1] for word in words]
+
+                words = []
+                for word_id in word_ids:
+                    for pair in vocab_words.items():
+                        if pair[1] == word_id:
+                            words.append(pair[0])
+                            break
+
+                self.logger.info("{} targets: {}".format(" ".join(words), " ".join([words[index] for index in range(len(pred)) if pred[index] == 1])))
+
+                i += 1
+
