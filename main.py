@@ -78,13 +78,13 @@ if __name__ == "__main__":
     max_upbt_deps_len = max(dev_deps.max_upbt_deps_len, test_deps.max_upbt_deps_len, train_deps.max_upbt_deps_len)
 
     # build model
-    config.ntags = len(vocab_tags)
+    config.ntags = 10 #len(vocab_tags)
     config.nwords = len(vocab_words)
     config.nchars = len(vocab_chars)
-    config.nrels = len(vocab_relations)
-    config.max_sentence_size = max_sentence_size
-    config.max_word_size = max_word_size
-    config.max_btup_deps_len = max_btup_deps_len
+    config.nrels = 120 #len(vocab_relations)
+    config.max_sentence_size = 150 #max_sentence_size
+    config.max_word_size = 45 #max_word_size
+    config.max_btup_deps_len = 40 #max_btup_deps_len
     config.max_upbt_deps_len = max_upbt_deps_len
     model = DepsModel(config, embeddings, logger=logger)
     model.build()

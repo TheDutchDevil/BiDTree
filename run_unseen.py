@@ -98,6 +98,16 @@ if __name__ == "__main__":
     model = DepsModel(config, embeddings, logger=logger)
     model.build()
 
+    print len(vocab_tags)
+    print len(vocab_words)
+    print len(vocab_chars)
+    print len(vocab_relations)
+    print max_sentence_size
+    print max_word_size
+    print max_btup_deps_len
+    print max_upbt_deps_len
+
+
     logger.info("Max sentence length of train data is {}, current max sent length is {}".format(max_sentence_size, data_in_CoNLL.max_words_len))
 
     model.predict(data_in_CoNLL, deps_data, vocab_words, vocab_tags)
